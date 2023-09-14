@@ -12,8 +12,7 @@
 <p align="center">
 a python app wich recognize the scramble of a rubiks cube using opencv, then it finds the solution using kociemba algorithm.
 <br /> 
-<a href="https://github.com/quentinformatique/cubeSolver"><strong>Explore the docs »</strong></a>
-<br /> 
+ 
 <br /> 
 <a href="https://github.com/quentinformatique/cubeSolver/releases/latest">Download</a>
 ·
@@ -25,7 +24,10 @@ a python app wich recognize the scramble of a rubiks cube using opencv, then it 
 </p> 
 </div>
 
-<!--ABOUT THE PROJECT -->
+## Sources
+
+<a href="https://pypi.org/project/kociemba/">Kociemba algorithm</a></br>
+<a href="https://pypi.org/project/opencv-python/">openCV</a>
 
 ## About The Project <br>
 
