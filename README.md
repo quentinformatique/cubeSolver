@@ -27,7 +27,8 @@ a python app wich recognize the scramble of a rubiks cube using opencv, then it 
 ## Sources
 
 <a href="https://pypi.org/project/kociemba/">Kociemba algorithm</a></br>
-<a href="https://pypi.org/project/opencv-python/">openCV</a>
+<a href="https://pypi.org/project/opencv-python/">openCV</a></br>
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/>
 
 ## About The Project <br>
 
