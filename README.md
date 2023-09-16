@@ -26,7 +26,11 @@ a python app wich recognize the scramble of a rubiks cube using opencv, then it 
 
 ## Sources
 
-<a href="https://pypi.org/project/kociemba/">Kociemba algorithm</a></br>
+<a href="https://pypi.org/project/kociemba/">
+Kociemba algorithm
+</a></br>
+
+
 <a href="https://pypi.org/project/opencv-python/">
 <img src="https://github.com/opencv/opencv/wiki/logo/OpenCV_logo_no_text.png" alt="open CV" width="40" height="40"/> openCV
 </a></br>
@@ -34,6 +38,7 @@ a python app wich recognize the scramble of a rubiks cube using opencv, then it 
 <a href="https://www.python.org">
 <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/> Python
 </a>
+
 ## About The Project <br>
 
 The project is using the kociemba algorithm to solve the cube, it is a two-phase algorithm. In the first phase, a table of all possible positions of the corners is created. In the second phase, the positions of the edges are solved using the table of the corners.
