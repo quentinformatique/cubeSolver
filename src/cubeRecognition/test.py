@@ -5,25 +5,6 @@ import numpy as np
 vid = cv2.VideoCapture(0)
 
 
-def get_color(hsl_value):
-    # Define hue value ranges for each color
-    color_ranges = {
-        "RED": (0, 20),
-        "ORANGE": (21, 35),
-        "YELLOW": (36, 85),
-        "GREEN": (86, 170),
-        "BLUE": (171, 260),
-        "WHITE": (-10, 10)
-    }
-
-    # Determine the color based on the hue value
-    for color, (lower, upper) in color_ranges.items():
-        if lower <= hsl_value <= upper:
-            return color
-
-    return "Undefined"
-
-
 def get_single_color(pixel):
     lab_color_range = {
         # Red
