@@ -4,43 +4,104 @@ import numpy as np
 # Initialize the video capture
 vid = cv2.VideoCapture(0)
 
-def getColor(hue_value):
-    # Define hue value ranges for each color
-    color_ranges = {
-        "RED": (0, 15),
-        "ORANGE": (10, 20),
-        "YELLOW": (20, 30),
-        "GREEN": (30, 85),
-        "BLUE": (85, 140),
-        "WHITE": (140, 180)
+
+def get_single_color(pixel):
+    lab_color_range = {
+        # Red
+        "RED": ((40, 30, 20),(100, 128, 128)),
+        # Orange
+        "ORANGE": ((40, 10, 20),(100, 128, 128)),
+        # Yellow
+        "YELLOW": ((60, 0, 20),(100, 128, 128)),
+        # Green
+        "GREEN": ((30, -10, 0),(100, 0, 128)),
+        # Blue
+        "BLUE": ((30, -10, -20),(100, 0, 0)),
+        # White
+        "WHITE": ((80, 0, 0),(100, 5, 5))
     }
+    pixel = tuple(pixel)
+    # Convert the pixel to Cielab color space
+    for color, (lower,upper) in lab_color_range.items():
 
-    # Determine the color based on the hue value
-    for color, (lower, upper) in color_ranges.items():
-        if lower <= hue_value <= upper:
+        if lower <= pixel <= upper:
             return color
-
     return "Undefined"
 
-def convertColorToRGB(color):
-    # Convert color names to RGB values
+
+def get_average_color(subframe):
+    height = subframe.shape[0]
+    width = subframe.shape[1]
+    average_color = [None] * ((height * width)+1)
+    counter = 0
+    for height_index in range(height):
+        for width_index in range(width):
+            pixel = subframe[height_index][width_index]
+            color = get_single_color(pixel)
+            counter += 1
+            average_color[counter] = convert_lab_color_to_RGB(color)
+
+    # count the different colors in the subframe
+    count_colours = {}
+    for colour in average_color:
+        if colour not in count_colours:
+            count_colours[colour] = 1
+        else:
+            count_colours[colour] += 1
+    # get the most frequent color in the subframe
+    most_frequent_color = max(count_colours, key=count_colours.get)
+
+    print("Most frequent color (BGR values):", most_frequent_color)
+    return most_frequent_color
+
+
+def convert_lab_color_to_RGB(color):
+
+    # Convert color names to BRG values
     if color == "RED":
-        return (0, 0, 255)
+        return (0, 255, 0)
     elif color == "ORANGE":
-        return (0, 165, 255)
+        return (0, 255, 150)
     elif color == "YELLOW":
         return (0, 255, 255)
     elif color == "GREEN":
         return (0, 255, 0)
     elif color == "BLUE":
-        return (255, 0, 0)
+        return (255, 0, 75)
     elif color == "WHITE":
         return (255, 255, 255)
     else:
         return (0, 0, 0)
 
+
+def convert_color_to_RGB(color):
+
+    # Convert color names to BRG values
+    if color == "RED":
+        return (0, 255, 0)
+    elif color == "ORANGE":
+        return (0, 255, 150)
+    elif color == "YELLOW":
+        return (0, 255, 255)
+    elif color == "GREEN":
+        return (0, 255, 0)
+    elif color == "BLUE":
+        return (255, 0, 75)
+    elif color == "WHITE":
+        return (255, 255, 255)
+    else:
+        return (0, 0, 0)
+
+
 def draw_rubiks_cube_grid(frame, cx, cy, grid_size):
-    # Draw the Rubik's Cube grid (3x3)
+    """
+    Draw the Rubik's Cube grid (3x3) on the given frame.
+
+    frame: The input image (or frame) on which you want to draw the grid.
+    cx: The x-coordinate of the center of the grid.
+    cy: The y-coordinate of the center of the grid.
+    grid_size: The size of the grid, which is the size of the square that contains the 3x3 grid.
+    """
     for i in range(3):
         for j in range(3):
             x1 = cx - grid_size // 2 + j * (grid_size // 3)
@@ -49,11 +110,12 @@ def draw_rubiks_cube_grid(frame, cx, cy, grid_size):
             y2 = y1 + (grid_size // 3)
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 2)
 
-def detectedColor(frame, cx, cy, grid_size):
+
+def detected_color(frame, cx, cy, grid_size):
     """
-    This function returns the detected colors in the given grid.
+    This function detects the colors in the given grid.
     """
-    matrixColor = [[], [], []]
+    matrix_color = [[], [], []]
     origin = (cx - grid_size // 2, cy - grid_size // 2)
     cell_size = grid_size // 3
 
@@ -61,14 +123,21 @@ def detectedColor(frame, cx, cy, grid_size):
     for i in range(3):
         row = []
         for j in range(3):
-            center_x = origin[0] + j * cell_size + cell_size // 2
-            center_y = origin[1] + i * cell_size + cell_size // 2
-            detected = getColor(frame[center_y, center_x][0])
-            row.append(detected)
-        matrixColor[i].extend(row)
-    return matrixColor
+            x1 = origin[0] + j * cell_size
+            y1 = origin[1] + i * cell_size
+            x2 = x1 + cell_size
+            y2 = y1 + cell_size
 
-def displayColors(frame, cx, cy, grid_size, matrix):
+            # take the frame of a lil cube instead of the 3*3 cube and change it to Cielab color space
+            frame_little_cube = frame[y1:y2, x1:x2]
+            detected = get_average_color(frame_little_cube)
+            row.append(detected)
+
+        matrix_color[i].extend(row)
+    return matrix_color
+
+
+def display_colors(frame, cx, cy, grid_size, matrix):
     """
     This function displays the detected colors in the given grid.
     """
@@ -83,13 +152,14 @@ def displayColors(frame, cx, cy, grid_size, matrix):
             y1 = origin[1] + i * cell_size
             x2 = x1 + cell_size
             y2 = y1 + cell_size
-            cv2.rectangle(frame, (x1, y1), (x2, y2), convertColorToRGB(color), -1)
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, -1)
+
 
 display_color_matrix = [[None, None, None], [None, None, None], [None, None, None]]
 
 while True:
     _, frame = vid.read()
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    lab_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
     height, width, _ = frame.shape
 
     cx = width // 2
@@ -99,9 +169,10 @@ while True:
 
     key = cv2.waitKey(1)
     if key == 32:  # Space key
-        display_color_matrix = detectedColor(frame, cx, cy, 320)
+        display_color_matrix = detected_color(lab_frame, cx, cy, 320)
+        print(display_color_matrix)
 
-    displayColors(frame, width - 60, height - 60, 100, display_color_matrix)  # Display in the bottom right
+    display_colors(frame, width - 60, height - 60, 100, display_color_matrix)  # Display in the bottom right
 
     cv2.imshow("Color", frame)
 

@@ -45,6 +45,7 @@ class Cube:
                 return face
         return None
 
+    # comment what this function do below
     def getFaceByIndex(self, index):
         return self.faces[index]
 
